@@ -196,3 +196,34 @@ class TestAccountService(TestCase):
         self.assertEqual(response_2.status_code, status.HTTP_204_NO_CONTENT)
 
         self.assertEqual(response_2.get_json(), None)
+
+    def test_list_accounts(self):
+        """It should return an array of accounts"""
+        number_accounts = 5
+        accounts = self._create_accounts(number_accounts)
+
+        response = self.client.get(
+            BASE_URL
+        )
+
+        data = response.get_json()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(data), number_accounts)
+
+
+    def test_list_accounts_no_accounts(self):
+        """It should return an empty array"""
+        response = self.client.get(
+            BASE_URL,
+            content_type="application/json"
+        )
+        data = response.get_json()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(data, [])
+
+    def test_method_not_allowed(self):
+        """It should not allow an illegal method call"""
+        resp = self.client.delete(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
